@@ -86,12 +86,15 @@ rangy.createModule("TextRange", ["WrappedSelection"], function(api, module) {
 
     // Properties representing whether trailing spaces inside blocks are completely collapsed (as they are in WebKit,
     // but not other browsers). Also test whether trailing spaces before <br> elements are collapsed.
-    var trailingSpaceInBlockCollapses = false;
+    var trailingSpaceInBlockCollapses = ( /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor) ) ? true : false;
     var trailingSpaceBeforeBrCollapses = false;
     var trailingSpaceBeforeBlockCollapses = false;
     var trailingSpaceBeforeLineBreakInPreLineCollapses = true;
 
-    (function() {
+    // #79499: Inline editor lose focus when rangy try to check trailing spaces.
+    // All browsers (Chrome, Safari, Firefox, IE8/9/10/11) don't collapse trailing spaces
+    // except Safari for space in block (trailingSpaceInBlockCollapses).
+    /*(function() {
         var el = dom.createTestElement(document, "<p>1 </p><p></p>", true);
         var p = el.firstChild;
         var sel = api.getSelection();
@@ -111,7 +114,7 @@ rangy.createModule("TextRange", ["WrappedSelection"], function(api, module) {
 
         dom.removeNode(el);
         sel.removeAllRanges();
-    })();
+    })();*/
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
