@@ -112,7 +112,7 @@
     var selectionHasRangeCount = (typeof testSelection.rangeCount == NUMBER);
     features.selectionHasRangeCount = selectionHasRangeCount;
 
-    var selectionSupportsMultipleRanges = false;
+    var selectionSupportsMultipleRanges = ( /firefox/i.test(navigator.userAgent) ) ? true : false;
     var collapsedNonEditableSelectionsSupported = true;
 
     var addRangeBackwardToNative = selectionHasExtend ?
@@ -124,7 +124,11 @@
             nativeSelection.extend(range.startContainer, range.startOffset);
         } : null;
 
-    if (util.areHostMethods(testSelection, ["addRange", "getRangeAt", "removeAllRanges"]) &&
+    // #79499: Iframe editor lose selection when rangy try to check multiple ranges in selection
+    // and collapsed non editable selections support.
+    // All browsers (Chrome, Safari, Firefox, IE8/9/10/11) don't collapse non editable selections
+    // and don't support multiple ranges in selection except Firefox for multiple ranges.
+    /*if (util.areHostMethods(testSelection, ["addRange", "getRangeAt", "removeAllRanges"]) &&
             typeof testSelection.rangeCount == NUMBER && features.implementsDomRange) {
 
         (function() {
@@ -198,7 +202,7 @@
                 }
             }
         })();
-    }
+    }*/
 
     features.selectionSupportsMultipleRanges = selectionSupportsMultipleRanges;
     features.collapsedNonEditableSelectionsSupported = collapsedNonEditableSelectionsSupported;
