@@ -141,19 +141,8 @@ function copyModuleScripts() {
         moduleCode = moduleCode.replace(/\/\*\s?build:modularizeWithRangyDependency\s?\*\/([\s\S]*?)\/\*\s?build:modularizeEnd\s?\*\//gm, function(match, code) {
             //var dependenciesArray = eval(dependencies);
             return [
-                '(function(factory, root) {',
-                '    if (typeof define == "function" && define.amd) {',
-                '        // AMD. Register as an anonymous module with a dependency on Rangy.',
-                '        define(["./rangy-core"], factory);',
-                '    } else if (typeof module != "undefined" && typeof exports == "object") {',
-                '        // Node/CommonJS style',
-                '        module.exports = factory( require("rangy") );',
-                '    } else {',
-                '        // No AMD or CommonJS support so we use the rangy property of root (probably the global variable)',
-                '        factory(root.rangy);',
-                '    }',
-                '})(function(rangy) {'
-            ].join("\n") + indent(code) + "\n" + indentation + "return rangy;\n}, this);";
+                '(function(rangy) {'
+            ].join("\n") + indent(code) + "\n" + indentation + "return rangy;\n})(this.rangy);";
         });
 
         fs.writeFileSync(uncompressedBuildDir + moduleFile, moduleCode, FILE_ENCODING);
