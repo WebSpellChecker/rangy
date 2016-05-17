@@ -5,7 +5,6 @@ var exec = require("child_process").exec;
 var uglifyJs = require("uglify-js");
 var rimraf = require("rimraf");
 var jshint = require("jshint");
-var archiver = require("archiver");
 
 var FILE_ENCODING = "utf-8";
 var indentation = "    ";
@@ -295,47 +294,6 @@ function minify() {
     }
 }
 
-function createArchiver(fileExtension, archiveCreatorFunc) {
-    return function() {
-        var compressedFileName = "rangy-" + buildVersion + "." + fileExtension;
-
-        var output = fs.createWriteStream(buildDir + compressedFileName);
-        var archive = archiveCreatorFunc();
-
-        output.on("close", function () {
-            console.log("Compressed " + archive.pointer() + " total bytes to " + compressedFileName);
-            callback();
-        });
-
-        archive.on("error", function(err){
-            throw err;
-        });
-
-        archive.pipe(output);
-        archive.bulk([
-            {
-                expand: true,
-                cwd: buildDir,
-                src: ["**", "!*.tar", "!*.gz", "!*.tgz", "!*.zip"]
-            }
-        ]);
-        archive.finalize();
-    }
-}
-
-var zip = createArchiver("zip", function() {
-    return archiver.create("zip");
-});
-
-var tarGz = createArchiver("tar.gz", function() {
-    return archiver.create("tar", {
-        gzip: true,
-        gzipOptions: {
-            level: 1
-        }
-    });
-});
-
 function copyToLib() {
     copyFilesRecursive(uncompressedBuildDir, "lib/");
     callback();
@@ -366,8 +324,6 @@ var actions = [
     substituteBuildVars,
     lint,
     minify,
-    zip,
-    tarGz,
     copyToLib,
     copyToRelease
 ];
